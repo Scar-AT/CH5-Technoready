@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: meli-order-system-test
+  datasource:
+    url: jdbc:h2:mem:meli_test_db;DB_CLOSE_DELAY=-1
+    #"DB_CLOSE_DELAY=-1" keeps the DB alive for the whole test session
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      # "create-drop" means Hibernate creates all tables at startup and drops them when tests finish.
+      # This guarantees test isolation.
+    show-sql: false # Turned off to reduce console clutter
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob.non_contextual_creation: true
+  test:
+    database:
+      replace: ANY
+
+  sql:
+    init:
+      mode: never
+      # Disables SQL scripts during testing
+
+server:
+  port: 0
+  # 0 for random ports available for test
+  error:
+    include-message: always
+    # validation errors are visible during tests responses
+
+logging:
+  level:
+    root: DEBUG
+    org.hibernate.sql: WARN
