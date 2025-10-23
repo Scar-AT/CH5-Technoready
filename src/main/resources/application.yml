@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: meli-order-system
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:meli_db}
+    driver-class-name: org.h2.Driver
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
