@@ -22,7 +22,7 @@ CH5-Technoready/
 
 ---
 
-## ⚙️ Technologies Used
+## ️Technologies Used
 
 - **Java 17**
 - **Spring Boot 3.3.3**
@@ -35,7 +35,7 @@ CH5-Technoready/
 
 ---
 
-## 🚀 How to Run the Project
+## How to Run the Project
 
 ### Prerequisites
 - Java 17 or higher
@@ -61,7 +61,7 @@ Once started:
 
 ---
 
-## 🧩 Available Endpoints
+## Endpoints
 
 | Method | Endpoint | Description |
 |--------|-----------|-------------|
