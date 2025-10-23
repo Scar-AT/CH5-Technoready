@@ -1,6 +1,8 @@
 spring:
   application:
     name: meli-order-system
+  profiles:
+    active: dev
   h2:
     console:
       enabled: true
@@ -17,8 +19,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  profiles:
-    active: dev
 
 server:
   port: 8080
