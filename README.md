@@ -1,83 +1,129 @@
 # MELI Order System
 
-## 📁 Project Structure
+## 📘 Project Overview
+The **MELI Order System** is a Spring Boot 3 application designed to simulate the management of online store orders.  
 
-```
-CH5-Technoready/
-│
-├── meli/
-│   ├── .mvn/                      # Maven wrapper files
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/              # Java source code
-│   │   │   └── resources/         # Configuration files (application.properties)
-│   │   └── test/                  # Unit and integration tests
-│   ├── target/                    # Compiled output (auto-generated)
-│   ├── mvnw / mvnw.cmd            # Maven wrapper executables
-│   ├── pom.xml                    # Maven project configuration
-│   └── README.md                  # Project documentation
-│
-└── .gitignore                     # Git ignored files and directories
-```
+The system allows creating, viewing, updating, and deleting customer orders, all managed through a RESTful API.
 
 ---
 
-## ️Technologies Used
-
+## ⚙️ Technologies Used
 - **Java 17**
-- **Spring Boot 3.3.3**
-    - Spring Web
-    - Spring Data JPA
-    - Spring Validation
-- **H2 Database (in-memory)**
+- **Spring Boot 3.5.6**
+- **Spring Data JPA**
+- **H2 In-Memory Database**
+- **Lombok**
 - **Maven**
-- **Lombok** (for boilerplate reduction)
+- **Postman** (for API testing)
+
+---
+
+## 📁 Project Structure
+```
+CH5-Technoready/
+ ├── src/
+ │   ├── main/
+ │   │   ├── java/com/techready/meli/
+ │   │   │   ├── controller/OrderController.java
+ │   │   │   ├── model/Order.java
+ │   │   │   └── repository/OrderRepository.java
+ │   │   └── resources/
+ │   │       ├── application.yml
+ │   │       ├── application-dev.yml
+ │   │       ├── application-test.yml
+ │   │       └── application-prod.yml
+ ├── pom.xml
+ ├── run-dev.bat
+ └── run-dev.sh
+```
 
 ---
 
 ## How to Run the Project
 
-### Prerequisites
-- Java 17 or higher
-- Maven installed or use Maven Wrapper (`mvnw`)
+### 🔹 Prerequisites
+- Java 17 or higher installed
+- Maven installed and added to PATH
 
-### Run Commands
-#### Option 1 — Using Maven Wrapper
+### 🔹 Running the Application
+
+#### Windows
 ```bash
-./mvnw spring-boot:run
+run-dev.bat
 ```
 
-#### Option 2 — Using Maven Installed Globally
+#### Linux / macOS
+Make the script executable once:
 ```bash
-mvn spring-boot:run
+chmod +x run-dev.sh
 ```
 
-Once started:
-- API Base URL → `http://localhost:8080`
-- H2 Console → `http://localhost:8080/h2-console`  
-  **JDBC URL:** `jdbc:h2:mem:testdb`  
-  **Username:** `sa`  
-  **Password:** *(leave blank)*
+Then run:
+```bash
+./run-dev.sh
+```
+
+This will start the application in the **dev profile**, using an in-memory H2 database.
 
 ---
 
-## Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
-|--------|-----------|-------------|
-| `POST` | `/api/orders` | Create a new order |
-| `GET` | `/api/orders` | List all orders |
-| `GET` | `/api/orders/{id}` | Retrieve an order by ID |
-| `PUT` | `/api/orders/{id}` | Update an existing order |
-| `DELETE` | `/api/orders/{id}` | Delete an order |
+|--------|-----------|--------------|
+| **POST** | `/api/orders` | Create a new order |
+| **GET** | `/api/orders` | Retrieve all orders |
+| **GET** | `/api/orders/{id}` | Retrieve a specific order |
+| **PUT** | `/api/orders/{id}` | Update an existing order |
+| **DELETE** | `/api/orders/{id}` | Delete an order |
 
-### Example: Create Order (POST)
+### Example JSON Body
 ```json
 {
-  "customerName": "Carlos Jiménez",
-  "product": "Noise Cancelling Headphones",
-  "quantity": 2,
-  "price": 1999,
-  "orderDate": "2025-10-17T14:05:00"
+  "customerName": "Mia Sánchez",
+  "product": "Wireless Keyboard",
+  "quantity": 1,
+  "price": 599.99,
+  "orderDate": "2025-10-17T10:00:00"
 }
 ```
+
+---
+
+## Postman Collection
+A Postman collection was developed to test all CRUD operations for the `/api/orders` resource, including:  
+- Create (POST)  
+- Read (GET)  
+- Update (PUT)  
+- Delete (DELETE)  
+
+Each request includes example data and descriptions.
+
+---
+
+## Database Configuration
+The project uses **H2 (in-memory)** as its database for quick setup.  
+The configuration can be found in `application-dev.yml`:
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:meli_db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 8080
+```
+
+H2 Console available at:  
+👉 [http://localhost:8080/h2-console](http://localhost:8080/h2-console)  
+JDBC URL: `jdbc:h2:mem:meli_db`
