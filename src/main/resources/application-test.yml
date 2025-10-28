@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: test
   application:
     name: meli-order-system-test
   datasource:
@@ -17,7 +20,8 @@ spring:
       hibernate:
         format_sql: true
         jdbc:
-          lob.non_contextual_creation: true
+          lob:
+            non_contextual_creation: true
   test:
     database:
       replace: ANY
