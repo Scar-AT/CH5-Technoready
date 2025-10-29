@@ -51,11 +51,9 @@ public class OrderController {
     }
 
     /**
-     *
      * Retrieves a specific order by ID.
      * @param id the order ID.
      * @return the corresponding order if found.
-     *
      * */
     @GetMapping("/{id}")
     public ResponseEntity<Order> get(@PathVariable Long id) {
@@ -65,13 +63,11 @@ public class OrderController {
     }
 
     /**
-     *
      * Updates a specific order by ID.
      *
      * @param id the order ID.
      * @param incoming the order details to update.
      * @return the updated order entity.
-     *
      * */
     @PutMapping("/{id}")
     public ResponseEntity<Order> update(@PathVariable Long id, @Valid @RequestBody Order incoming) {
@@ -86,11 +82,9 @@ public class OrderController {
     }
 
     /**
-     *
      * Deletes an order by ID.
      * @param id the order ID.
      * @return empty 204 "No content response".
-     *
      * */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

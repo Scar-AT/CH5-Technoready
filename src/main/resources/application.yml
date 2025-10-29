@@ -1,8 +1,6 @@
 spring:
   application:
     name: meli-order-system
-  profiles:
-    active: dev
   h2:
     console:
       enabled: true
