@@ -50,22 +50,26 @@ CH5-Technoready/
 ### Prerequisites
 - Java 17 or higher installed
 - Maven installed and added to PATH
-### Running the Application
-#### Windows
+
+#### 🚀 Startup Script
+The included run-dev.sh file launches the project automatically:
 ```bash
-run-dev.bat
+#!/bin/bash
+echo "Starting MELI Order System..."
+source .env
+mvn spring-boot:run -Dspring-boot.run.profiles=$SPRING_PROFILES_ACTIVE
 ```
 
-#### Linux / macOS
-Make the script executable once:
+Make it executable:
 ```bash
 chmod +x run-dev.sh
 ```
 
 Then run:
-```bash
+```
 ./run-dev.sh
 ```
+
 
 This will start the application in the **dev profile**, using an in-memory H2 database.
 
@@ -201,22 +205,4 @@ Set the active profile directly:
 SPRING_PROFILES_ACTIVE=prod
 ```
 
-## 🚀 Startup Script
-The included run-dev.sh file launches the project automatically:
-```bash
-#!/bin/bash
-echo "Starting MELI Order System..."
-source .env
-mvn spring-boot:run -Dspring-boot.run.profiles=$SPRING_PROFILES_ACTIVE
-```
-
-Make it executable:
-```bash
-chmod +x run-dev.sh
-```
-
-Then run:
-```
-./run-dev.sh
-```
 
