@@ -1,59 +1,66 @@
 # MELI Order System
 
 ## 📘 Project Overview
-The **MELI Order System** is a Spring Boot 3 application designed to simulate the management of online store orders.  
+The **MELI Order System** is a Spring Boot 3 application designed to simulate the management of online store orders.
 
-The system allows creating, viewing, updating, and deleting customer orders, all managed through a RESTful API.
+The system allows creating, viewing, updating, deleting, and **searching** customer orders, all managed through a RESTful API.
 
 **Main Features:**
-- Create, read, update, and delete customer orders.
+- Create, read, update, delete, and search customer orders.
 - Integrated H2 database for local development.
 - PostgreSQL support for production environments.
 - Environment-specific profiles (`dev`, `test`, `prod`) using YAML configuration.
 - Secure environment variable management via `.env` files.
+- Dynamic endpoint for **filtering and searching** orders by text, numeric, or date parameters.
 
+---
 
-## ⚙️ Technologies Used
+## ⚙️ Technologies
 - **Java 17**
 - **Spring Boot 3.5.6**
 - **Spring Data JPA**
-- **H2 In-Memory Database**
+- **PostgreSQL / H2**
 - **Lombok**
 - **Maven**
-- **Postman** (for API testing)
+- **Postman** (for testing)
 
+---
 
 ## 📁 Project Structure
 ```
 CH5-Technoready/
 ├── src/
-│ └── main/
-│     ├── java/com/techready/meli/
-│     │     ├── controller/OrderController.java
-│     │     ├── model/Order.java
-│     │     └── repository/OrderRepository.java
-│     │
-│     └── resources/
+│   └── main/
+│       ├── java/com/techready/meli/
+│       │   ├── controller/OrderController.java
+│       │   ├── model/Order.java
+│       │   └── repository/OrderRepository.java
+│       │
+│       └── resources/
 │           ├── application.yml
 │           ├── application-dev.yml
 │           ├── application-test.yml
 │           └── application-prod.yml
-│ 
+│
 ├── .env
 ├── .env.example
-├── startup.sh
+├── run-meli.bat
+├── run-meli.sh
 └── pom.xml
 ```
 
-## API Endpoints
+---
+
+## 🚀 API Endpoints
 
 | Method | Endpoint | Description |
 |--------|-----------|--------------|
 | **POST** | `/api/orders` | Create a new order |
 | **GET** | `/api/orders` | Retrieve all orders |
-| **GET** | `/api/orders/{id}` | Retrieve a single order by ID|
+| **GET** | `/api/orders/{id}` | Retrieve a single order by ID |
 | **PUT** | `/api/orders/{id}` | Update an existing order |
 | **DELETE** | `/api/orders/{id}` | Delete an order by ID |
+| **GET** | `/api/orders/search` | Search and filter orders|
 
 ### Example JSON Body
 ```json
@@ -66,21 +73,68 @@ CH5-Technoready/
 }
 ```
 
-## Postman Collection
-A Postman collection was developed to test all CRUD operations for the `/api/orders` resource, including:  
-- Create (POST)  
-- Read (GET)  
-- Update (PUT)  
-- Delete (DELETE)  
+---
 
-Each request includes example data and descriptions.
+## 🔍 Search & Filter Endpoint
+
+### Endpoint
+```
+GET /api/orders/search
+```
+
+### Optional Query Parameters
+| Parameter | Type | Description |
+|------------|------|--------------|
+| `customerName` | String | Partial match search by customer name |
+| `product` | String | Partial match by product name |
+| `minQuantity` | Integer | Orders with quantity ≥ value |
+| `maxPrice` | Double | Orders with price ≤ value |
+| `startDate` | ISO Date Time | e.g. `2025-10-23T00:00:00` |
+| `endDate` | ISO Date Time | e.g. `2025-10-30T23:59:59` |
+
+### Examples
+```bash
+# Get all orders
+GET /api/orders/search
+
+# Filter by customer name
+GET /api/orders/search?customerName=Scarlett
+
+# Filter by price and date range
+GET /api/orders/search?maxPrice=900&startDate=2025-10-23T00:00:00&endDate=2025-10-30T23:59:59
+```
+
+### Example Response
+```json
+[
+  {
+    "id": 1,
+    "customerName": "Scarlett",
+    "product": "Wireless Headphones",
+    "quantity": 2,
+    "price": 799.99,
+    "orderDate": "2025-10-23T15:55:00"
+  }
+]
+```
 
 ---
 
-## Database Configuration
-### 🧪 Development Profile
-The project uses **H2 (in-memory)** as its database for quick setup.  
-The configuration can be found in `application-dev.yml`:
+## 🧪 Postman Collection
+The updated Postman collection (`MELI-OrderSystem.postman_collection.json`) includes:
+- CRUD tests
+- Search & filter tests
+- Validations for responses (`200 OK`, `204 No Content`, `400 Bad Request`)
+- Example query parameters
+
+---
+
+## 🗄️ Database Configuration
+
+### 🧪 Development Profile (H2)
+The project uses **H2 (in-memory)** for local testing and fast startup.  
+Configuration (from `application-dev.yml`):
+
 ```yaml
 spring:
   datasource:
@@ -100,21 +154,21 @@ server:
   port: 8080
 ```
 
-H2 Console available at:  
-👉 [http://localhost:8080/h2-console](http://localhost:8080/h2-console)  
-JDBC URL: `jdbc:h2:mem:meli_db`
-
----
-### 🧪 Test profile
-Uses H2 in-memory database with create-drop to auto-reset between test runs.
-Configured for debugging and validation.
+H2 Console → [http://localhost:8080/h2-console](http://localhost:8080/h2-console)  
+JDBC URL → `jdbc:h2:mem:meli_db`
 
 ---
 
+### 🧩 Test Profile
+Used for integration testing.  
+Can be configured with H2 or PostgreSQL depending on test environment.  
+Automatically resets data between test runs.
 
-### 🚀 Production profile
-Uses PostgreSQL for persistent storage.
-Reads credentials from system variables or `.env` 
+---
+
+### 🚀 Production Profile
+Uses **PostgreSQL** for persistent storage.  
+Reads credentials from system variables or `.env`.
 
 ```yaml
 spring:
@@ -125,9 +179,12 @@ spring:
     password: ${POSTGRES_PASSWORD:admin}
 ```
 
-#### 🔐 Environment variables
-Environment variables are managed via a `.env` file in the project root.
-Example `.env`
+---
+
+### 🔐 Environment Variables
+Managed via `.env` file at project root.
+
+`.env`
 ```bash
 # --- DEV (H2)
 DB_URL=jdbc:h2:mem:meli_db
@@ -139,7 +196,7 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=admin
 ```
 
-Example `.env.example`
+`.env.example`
 ```bash
 # Copy this file to .env and fill with your credentials
 
@@ -158,42 +215,36 @@ DB_PASSWORD=
 # POSTGRES_PASSWORD=admin
 ```
 
+---
+
 ## 🔄 Switching Profiles
 
 You can switch profiles in one of two ways:
 
-### Option 1 – Using Maven
+### Option 1 – Maven
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 mvn spring-boot:run -Dspring-boot.run.profiles=test
 mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
 
-### Option 2 – Inside `.env`
-
+### Option 2 – Environment File
 Set the active profile directly:
 ```bash
 SPRING_PROFILES_ACTIVE=prod
 ```
 
-#### 🚀 Startup Script
-The included run-dev.sh file launches the project automatically:
+---
+
+### 🚀 Startup Scripts
+Scripts automatically load the `.env` variables and start the appropriate profile.
+
+Windows:
 ```bash
-#!/bin/bash
-echo "Starting MELI Order System..."
-source .env
-mvn spring-boot:run -Dspring-boot.run.profiles=$SPRING_PROFILES_ACTIVE
+run-meli.bat
 ```
 
-Make it executable:
+Linux / Mac:
 ```bash
-chmod +x run-dev.sh
+./run-meli.sh
 ```
-
-Then run:
-```
-./run-dev.sh
-```
-
-This will start the application in the **dev profile**, using an in-memory H2 database.
-
