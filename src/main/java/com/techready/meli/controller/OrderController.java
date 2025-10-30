@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -92,4 +93,48 @@ public class OrderController {
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Order>> searchOrders(
+            @RequestParam(required = false) String customerName,
+            @RequestParam(required = false) String product,
+            @RequestParam(required = false) Integer minQuantity,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        java.time.LocalDateTime start = null;
+        java.time.LocalDateTime end = null;
+
+        try {
+            if (startDate != null && !startDate.isBlank()) {
+                start = java.time.LocalDateTime.parse(startDate, formatter);
+            }
+            if (endDate != null && !endDate.isBlank()) {
+                end = java.time.LocalDateTime.parse(endDate, formatter);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final java.time.LocalDateTime startFinal = start;
+        final java.time.LocalDateTime endFinal = end;
+
+        List<Order> filtered = repository.findAll().stream()
+                .filter(o -> customerName == null || o.getCustomerName().toLowerCase().contains(customerName.toLowerCase()))
+                .filter(o -> product == null || o.getProduct().toLowerCase().contains(product.toLowerCase()))
+                .filter(o -> minQuantity == null || o.getQuantity() >= minQuantity)
+                .filter(o -> maxPrice == null || o.getPrice() <= maxPrice)
+                .filter(o -> startFinal == null || !o.getOrderDate().isBefore(startFinal))
+                .filter(o -> endFinal == null || !o.getOrderDate().isAfter(endFinal))
+                .sorted((a, b) -> b.getOrderDate().compareTo(a.getOrderDate()))
+                .toList();
+
+        if (filtered.isEmpty()) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(filtered);
+    }
+
+
+
 }
