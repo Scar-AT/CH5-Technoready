@@ -41,4 +41,4 @@ server:
 logging:
   level:
     root: DEBUG
-    org.hibernate.sql: WARN
+    org.hibernate.sql: DEBUG
