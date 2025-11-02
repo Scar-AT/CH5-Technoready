@@ -3,11 +3,23 @@ package com.techready.meli.controller;
 import com.techready.meli.model.Order;
 import com.techready.meli.repository.OrderRepository;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+
 
 /**
  * REST controller that exposes CRUD endpoints for managing orders.
@@ -95,46 +107,46 @@ public class OrderController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Order>> searchOrders(
+    public ResponseEntity<Map<String, Object>> searchOrders(
             @RequestParam(required = false) String customerName,
             @RequestParam(required = false) String product,
             @RequestParam(required = false) Integer minQuantity,
             @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(defaultValue = "orderDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
 
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-        java.time.LocalDateTime start = null;
-        java.time.LocalDateTime end = null;
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
 
-        try {
-            if (startDate != null && !startDate.isBlank()) {
-                start = java.time.LocalDateTime.parse(startDate, formatter);
-            }
-            if (endDate != null && !endDate.isBlank()) {
-                end = java.time.LocalDateTime.parse(endDate, formatter);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        final java.time.LocalDateTime startFinal = start;
-        final java.time.LocalDateTime endFinal = end;
+        Page<Order> ordersPage = repository.searchOrders(
+                customerName,
+                product,
+                minQuantity,
+                maxPrice,
+                startDate,
+                endDate,
+                pageable
+        );
 
-        List<Order> filtered = repository.findAll().stream()
-                .filter(o -> customerName == null || o.getCustomerName().toLowerCase().contains(customerName.toLowerCase()))
-                .filter(o -> product == null || o.getProduct().toLowerCase().contains(product.toLowerCase()))
-                .filter(o -> minQuantity == null || o.getQuantity() >= minQuantity)
-                .filter(o -> maxPrice == null || o.getPrice() <= maxPrice)
-                .filter(o -> startFinal == null || !o.getOrderDate().isBefore(startFinal))
-                .filter(o -> endFinal == null || !o.getOrderDate().isAfter(endFinal))
-                .sorted((a, b) -> b.getOrderDate().compareTo(a.getOrderDate()))
-                .toList();
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", ordersPage.getContent());
+        response.put("currentPage", ordersPage.getNumber());
+        response.put("totalItems", ordersPage.getTotalElements());
+        response.put("totalPages", ordersPage.getTotalPages());
+        response.put("pageSize", ordersPage.getSize());
+        response.put("sortBy", sortBy);
+        response.put("direction", direction);
 
-        if (filtered.isEmpty()) return ResponseEntity.noContent().build();
-        return ResponseEntity.ok(filtered);
+        return ResponseEntity.ok(response);
     }
-
 
 
 }

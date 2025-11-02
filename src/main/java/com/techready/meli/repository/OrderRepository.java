@@ -1,18 +1,18 @@
 package com.techready.meli.repository;
 
 import com.techready.meli.model.Order;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * Repository interface for {@link Order} entities.
  *
  * Extends JpaRepository to provide CRUD operations and
- * custom search/filtering queries for Sprint 3.
+ * custom search/filtering queries with pagination and sorting for Sprint 3.
  */
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -20,12 +20,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
      * Dynamic search query combining multiple optional filters.
      *
-     * Allows filtering by:
+     * Supports filtering by:
      * - Customer name (partial match)
      * - Product (partial match)
      * - Minimum quantity
      * - Maximum price
      * - Order date range
+     *
+     * Results are returned as a Page object for pagination and sorting.
      */
     @Query("""
     SELECT o FROM Order o
@@ -35,14 +37,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       AND (:maxPrice IS NULL OR o.price <= :maxPrice)
       AND (:startDate IS NULL OR o.orderDate >= :startDate)
       AND (:endDate IS NULL OR o.orderDate <= :endDate)
-    ORDER BY o.orderDate DESC
     """)
-    List<Order> searchOrders(
+    Page<Order> searchOrders(
             @Param("customerName") String customerName,
             @Param("product") String product,
             @Param("minQuantity") Integer minQuantity,
             @Param("maxPrice") Double maxPrice,
             @Param("startDate") java.time.LocalDateTime startDate,
-            @Param("endDate") java.time.LocalDateTime endDate
+            @Param("endDate") java.time.LocalDateTime endDate,
+            Pageable pageable
     );
 }
