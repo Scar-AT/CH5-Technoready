@@ -66,8 +66,10 @@ public class OrderController {
             @RequestParam(defaultValue = "desc") String direction
     ) {
 
-        Pageable pageable = PageRequest.of(page, size,
-                direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.unsorted());
+
+        if (customerName != null && customerName.isBlank()) customerName = null;
+        if (product != null && product.isBlank()) product = null;
 
         Page<Order> resultPage = repository.searchOrders(
                 customerName, product, minQuantity, maxPrice, startDate, endDate, pageable

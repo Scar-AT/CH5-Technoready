@@ -3,18 +3,23 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: ${PROD_DB_URL:jdbc:postgresql://localhost:5432/meli_prod}
+    url: ${PROD_DB_URL:jdbc:postgresql://localhost:5432/meli_prod?stringtype=unspecified}
     driver-class-name: org.postgresql.Driver
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:admin}
+    hikari:
+      connection-init-sql: SET standard_conforming_strings = on
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
 server:
   port: 8082
@@ -22,3 +27,4 @@ server:
 logging:
   level:
     root: WARN
+    org.hibernate.sql: DEBUG

@@ -10,36 +10,29 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
-/**
- * Repository interface for {@link Order} entities.
- *
- * Extends JpaRepository to provide CRUD operations and
- * custom search/filtering queries with pagination and sorting for Sprint 3.
- */
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    /**
-     * Dynamic search query combining multiple optional filters.
-     *
-     * Supports filtering by:
-     * - Customer name (partial match)
-     * - Product (partial match)
-     * - Minimum quantity
-     * - Maximum price
-     * - Order date range
-     *
-     * Results are returned as a Page object for pagination and sorting.
-     */
-    @Query("""
-        SELECT o FROM Order o
-        WHERE (COALESCE(:customerName, '') = '' OR o.customerName ILIKE CONCAT('%', :customerName, '%'))
-          AND (COALESCE(:product, '') = '' OR o.product ILIKE CONCAT('%', :product, '%'))
-          AND (:minQuantity IS NULL OR o.quantity >= :minQuantity)
-          AND (:maxPrice IS NULL OR o.price <= :maxPrice)
-          AND (:startDate IS NULL OR o.orderDate >= :startDate)
-          AND (:endDate IS NULL OR o.orderDate <= :endDate)
-        """)
+    @Query(value = """
+        SELECT * FROM orders o
+        WHERE (CAST(:customerName AS TEXT) IS NULL OR o.customer_name ILIKE CONCAT('%', CAST(:customerName AS TEXT), '%'))
+          AND (CAST(:product AS TEXT) IS NULL OR o.product ILIKE CONCAT('%', CAST(:product AS TEXT), '%'))
+          AND (CAST(:minQuantity AS INTEGER) IS NULL OR o.quantity >= CAST(:minQuantity AS INTEGER))
+          AND (CAST(:maxPrice AS DOUBLE PRECISION) IS NULL OR o.price <= CAST(:maxPrice AS DOUBLE PRECISION))
+          AND (CAST(:startDate AS TIMESTAMP) IS NULL OR o.order_date >= CAST(:startDate AS TIMESTAMP))
+          AND (CAST(:endDate AS TIMESTAMP) IS NULL OR o.order_date <= CAST(:endDate AS TIMESTAMP))
+        ORDER BY o.order_date DESC
+        """,
+            countQuery = """
+        SELECT COUNT(*) FROM orders o
+        WHERE (CAST(:customerName AS TEXT) IS NULL OR o.customer_name ILIKE CONCAT('%', CAST(:customerName AS TEXT), '%'))
+          AND (CAST(:product AS TEXT) IS NULL OR o.product ILIKE CONCAT('%', CAST(:product AS TEXT), '%'))
+          AND (CAST(:minQuantity AS INTEGER) IS NULL OR o.quantity >= CAST(:minQuantity AS INTEGER))
+          AND (CAST(:maxPrice AS DOUBLE PRECISION) IS NULL OR o.price <= CAST(:maxPrice AS DOUBLE PRECISION))
+          AND (CAST(:startDate AS TIMESTAMP) IS NULL OR o.order_date >= CAST(:startDate AS TIMESTAMP))
+          AND (CAST(:endDate AS TIMESTAMP) IS NULL OR o.order_date <= CAST(:endDate AS TIMESTAMP))
+        """,
+            nativeQuery = true)
     Page<Order> searchOrders(
             @Param("customerName") String customerName,
             @Param("product") String product,
@@ -49,8 +42,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endDate") LocalDateTime endDate,
             Pageable pageable
     );
-
-
-
-
 }
