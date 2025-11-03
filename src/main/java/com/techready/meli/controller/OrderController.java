@@ -8,6 +8,15 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
+
+
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -24,6 +33,12 @@ public class OrderController {
     }
 
 
+    @Operation(summary = "Create a new order", description = "Registers a new order with customer and product details.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Order created successfully",
+                    content = @Content(schema = @Schema(implementation = Order.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid order data"),
+    })
     @PostMapping
     public ResponseEntity<Order> create(@Valid @RequestBody Order order) {
         Order saved = repository.save(order);
@@ -31,6 +46,8 @@ public class OrderController {
     }
 
 
+    @Operation(summary = "List all orders", description = "Retrieves every order stored in the system.")
+    @ApiResponse(responseCode = "200", description = "Orders retrieved successfully")
     @GetMapping
     public Page<Order> list(
             @RequestParam(defaultValue = "0") int page,
@@ -44,6 +61,11 @@ public class OrderController {
     }
 
 
+    @Operation(summary = "Get order by ID", description = "Retrieves an order by its unique identifier.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Order found"),
+            @ApiResponse(responseCode = "404", description = "Order not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Order> get(@PathVariable Long id) {
         return repository.findById(id)
@@ -52,6 +74,15 @@ public class OrderController {
     }
 
 
+    @Operation(
+            summary = "Search orders with filters, pagination and sorting",
+            description = "Filters by customer name, product, quantity range, price range, and date range. "
+                    + "Supports sorting by any field and pagination."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Search executed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid search parameters")
+    })
     @GetMapping("/search")
     public ResponseEntity<Map<String, Object>> searchOrders(
             @RequestParam(required = false) String customerName,
@@ -87,6 +118,12 @@ public class OrderController {
     }
 
 
+
+    @Operation(summary = "Update an existing order", description = "Updates customer, product, quantity, price, or date.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Order updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Order not found")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<Order> update(@PathVariable Long id, @Valid @RequestBody Order incoming) {
         return repository.findById(id).map(existing -> {
@@ -100,6 +137,12 @@ public class OrderController {
     }
 
 
+
+    @Operation(summary = "Delete an order", description = "Removes an order by its ID.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Order deleted"),
+            @ApiResponse(responseCode = "404", description = "Order not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!repository.existsById(id)) return ResponseEntity.notFound().build();

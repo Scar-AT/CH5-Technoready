@@ -47,7 +47,6 @@ class OrderControllerTests {
         orderRepository.save(sampleOrder);
     }
 
-    // 1️⃣ CREATE
     @Test
     @DisplayName("Should create a new order successfully")
     void testCreateOrder() throws Exception {
@@ -66,7 +65,6 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$.product").value("Noise Cancelling Headphones"));
     }
 
-    // 2️⃣ READ ALL
     @Test
     @DisplayName("Should list all orders")
     void testGetAllOrders() throws Exception {
@@ -75,7 +73,7 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$.content").isArray());
     }
 
-    // 3️⃣ READ BY ID
+
     @Test
     @DisplayName("Should get order by ID")
     void testGetOrderById() throws Exception {
@@ -84,7 +82,7 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$.customerName").value("Daniela Morales"));
     }
 
-    // 4️⃣ UPDATE
+
     @Test
     @DisplayName("Should update existing order")
     void testUpdateOrder() throws Exception {
@@ -97,7 +95,6 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$.quantity").value(5));
     }
 
-    // 5️⃣ DELETE
     @Test
     @DisplayName("Should delete an order by ID")
     void testDeleteOrder() throws Exception {
@@ -105,7 +102,6 @@ class OrderControllerTests {
                 .andExpect(status().isNoContent());
     }
 
-    // 6️⃣ SEARCH (filters)
     @Test
     @DisplayName("Should search orders by product name")
     void testSearchOrders() throws Exception {
@@ -126,7 +122,6 @@ class OrderControllerTests {
     }
 
 
-    // 7️⃣ EDGE CASE
     @Test
     @DisplayName("Should return 404 when getting non-existent order")
     void testGetNonExistentOrder() throws Exception {
