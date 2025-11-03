@@ -248,3 +248,54 @@ Linux / Mac:
 ```bash
 ./run-meli.sh
 ```
+
+
+---
+
+## 🧭 API Documentation (Swagger / OpenAPI)
+
+The MELI Order System is fully documented using **Swagger (OpenAPI 3.0)**.  
+Swagger provides an interactive interface to explore, test, and visualize the API endpoints.
+
+### 🧩 Access Points
+
+| Type | URL |
+|------|-----|
+| Swagger UI (interactive) | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
+| Raw OpenAPI JSON | [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs) |
+
+> If you are using a different port (e.g. `8082`), adjust the URL accordingly.
+
+### 🧱 Features
+
+- Auto-generated documentation for all endpoints (`/api/orders`, `/api/orders/{id}`, `/api/orders/search`)
+- Request & response schemas included automatically
+- Supports live testing via the **"Try it out"** feature
+- Integrated with profiles (`dev`, `test`, `prod`)
+
+### 🧰 Custom Configuration
+The configuration file is located at:
+``src/main/java/com/techready/meli/config/OpenApiConfig.java``
+
+
+This file defines:
+- API title and description
+- Versioning information
+- Contact details
+- License reference
+
+### 💡 Example Usage
+From Swagger UI:
+1. Expand the endpoint (e.g. `POST /api/orders`)
+2. Click **“Try it out”**
+3. Enter a JSON body:
+```json
+{
+  "customerName": "Ana Lilia Tiznado",
+  "product": "Wireless Mouse",
+  "quantity": 2,
+  "price": 139.99,
+  "orderDate": "2025-10-23T15:55:00"
+}
+```
+4. Click Execute to run it directly from the browser.
